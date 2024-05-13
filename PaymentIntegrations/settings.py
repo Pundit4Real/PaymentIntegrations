@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     #custom apps
     'payStack',
+    'payStack_Api',
 
     #third party apps
     'corsheaders',

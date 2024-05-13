@@ -7,7 +7,7 @@ from payStack.models import Payment
 
 # Create your views here.
 
-def initiate_payment(request:HttpRequest) -> HttpResponse:
+def initiate_payment(request) -> str:
     if request.method == 'POST':
         payment_form = PaymentForm(request.POST)
         if payment_form.is_valid():
@@ -18,7 +18,7 @@ def initiate_payment(request:HttpRequest) -> HttpResponse:
     return render(request,'initiate_payment.html', {'payment_form':payment_form,})
 
 
-def verify_payment(request: HttpRequest,ref: str) ->HttpResponse:
+def verify_payment(request, ref) ->str:
     payment = get_object_or_404(Payment, ref=ref)
     verified = payment.verify_payment()
     if verified:
