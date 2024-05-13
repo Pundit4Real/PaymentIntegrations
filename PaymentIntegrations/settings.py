@@ -41,10 +41,13 @@ INSTALLED_APPS = [
 
     #custom apps
     'payStack',
+
     #third party apps
     'corsheaders',
     'rest_framework',
-    'crispy-forms',
+    'crispy_forms',
+    "crispy_bootstrap5",
+
 
 
 ]
@@ -65,7 +68,7 @@ ROOT_URLCONF = 'PaymentIntegrations.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR /'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -153,5 +156,10 @@ REST_FRAMEWORK = {
 
 #paystack configurations
 
-PAYSTACK_SECRET_KEY = os.environ.get('PAYSTACK_SECRET_KEY')
-PAYSTACK_PUBLIC_KEY = os.environ.get('PAYSTACK_PUBLIC_KEY')
+PAYSTACK_SECRET_KEY = 'sk_test_9a72f1cb1bed6c7ca0890957543b575c873bfc5f'
+PAYSTACK_PUBLIC_KEY = 'pk_test_b7b13ed720bd4524267e8b33db8d8ac6571d9620'
+
+
+#CRISPY FORMS CONFIGURATIONS
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
