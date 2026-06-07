@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Integrations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        .page-card {
+            border: none;
+            border-radius: 1.25rem;
+            box-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+        }
+        .hero-banner {
+            background: linear-gradient(180deg, rgba(59, 130, 246, 0.95), rgba(37, 99, 235, 0.9));
+            color: white;
+        }
+        .hero-banner h1, .hero-banner p {
+            color: white;
+        }
+        .btn-primary,
+        .btn-success {
+            min-width: 180px;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold" href="/">PayStack Demo</a>
+            <div class="d-flex gap-2">
+                <span class="navbar-text text-white-50">Secure checkout powered by Django</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="py-5">
+        <div class="container">
+            {% block content %}
+            {% endblock content %}
+        </div>
+    </main>
+
+    <footer class="text-center py-4 text-secondary small">
+        Built with Bootstrap · Paystack integration demo
+    </footer>
+</body>
+</html>

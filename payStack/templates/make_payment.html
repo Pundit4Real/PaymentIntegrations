@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <div class="card page-card">
+            <div class="card-header hero-banner py-4">
+                <div class="text-center">
+                    <h2 class="h4 mb-1">Confirm your payment</h2>
+                    <p class="mb-0 text-white-75">Secure checkout powered by Paystack.</p>
+                </div>
+            </div>
+            <div class="card-body p-5">
+                <div class="mb-4">
+                    <p class="text-uppercase text-muted small mb-2">Payment amount</p>
+                    <h3 class="fw-semibold">{{ paystack_currency }} {{ payment.amount }}</h3>
+                    <p class="text-muted mb-2">Reference: <span class="fw-medium">{{ payment.ref }}</span></p>
+                    <p class="text-muted mb-0">Email: <span class="fw-medium">{{ payment.email }}</span></p>
+                </div>
+
+                <div class="d-grid gap-3">
+                    <button class="btn btn-success btn-lg" onclick="payWithPaystack()" id="django-paystack-button">Pay with Paystack</button>
+                    <a href="{% url 'initiate-payment' %}" class="btn btn-outline-secondary">Change amount</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+    function payWithPaystack() {
+        const paymentConfig = {
+            key: "{{ paystack_public_key }}",
+            email: "{{ payment.email }}",
+            amount: "{{ payment.amount_value }}",
+            currency: "{{ paystack_currency }}",
+            ref: "{{ payment.ref }}",
+            callback: function(response) {
+                window.location.href = '{% url "verify-payment" payment.ref %}';
+            },
+            onClose: function() {
+                alert('Payment window closed. You can retry when ready.');
+            }
+        };
+
+        const handler = PaystackPop.setup(paymentConfig);
+        handler.openIframe();
+    }
+</script>
+{% endblock content %}
