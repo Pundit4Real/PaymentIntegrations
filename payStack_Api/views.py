@@ -55,78 +55,41 @@ class DirectChargeView(APIView):
         description="Create a direct Paystack charge and optionally return an OTP requirement.",
     )
     def post(self, request):
-        serializer = DirectChargeRequestSerializer(data=request.data)
+        serializer = DirectChargeSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
             paystack_secret_key = settings.PAYSTACK_SECRET_KEY
+            paystack_api_url = "https://api.paystack.co/charge"
             headers = {
                 "Authorization": f"Bearer {paystack_secret_key}",
                 "Content-Type": "application/json",
             }
-
             amount = int(data["amount"] * Decimal(100))
             reference = data.get("reference") or f"order-{uuid.uuid4().hex[:12]}"
+            payload = {
+                "amount": amount,
+                "reference": reference,
+                "currency": data.get("currency", settings.PAYSTACK_CURRENCY),
+            }
 
-            method = data.get('method', 'mobile_money')
+            if data.get("email"):
+                payload["email"] = data["email"]
 
-            # Mobile money/direct charge via /charge
-            if method == 'mobile_money':
-                paystack_api_url = "https://api.paystack.co/charge"
-                payload = {
-                    "amount": amount,
-                    "reference": reference,
-                    "currency": data.get("currency", settings.PAYSTACK_CURRENCY),
-                    "mobile_money": {
-                        "phone": data["phone"],
-                        "provider": data.get("provider"),
-                    }
+            if data.get("authorization_code"):
+                payload["authorization_code"] = data["authorization_code"]
+
+            if data.get("phone"):
+                payload["mobile_money"] = {
+                    "phone": data["phone"],
+                    "provider": data.get("provider"),
                 }
-                if data.get("email"):
-                    payload["email"] = data["email"]
-                response = requests.post(paystack_api_url, json=payload, headers=headers)
 
-            # Card charge expects an authorization_code (tokenized card)
-            elif method == 'card':
-                if not data.get('authorization_code'):
-                    return Response({"detail": "authorization_code required for card charges."}, status=400)
-                paystack_api_url = "https://api.paystack.co/charge"
-                payload = {
-                    "amount": amount,
-                    "reference": reference,
-                    "currency": data.get("currency", settings.PAYSTACK_CURRENCY),
-                    "authorization_code": data.get('authorization_code'),
-                }
-                if data.get("email"):
-                    payload["email"] = data["email"]
-                response = requests.post(paystack_api_url, json=payload, headers=headers)
+            if data.get("metadata") is not None:
+                payload["metadata"] = data["metadata"]
 
-            # Bank transfer: use transaction initialize with channels set to bank
-            elif method == 'bank':
-                paystack_api_url = "https://api.paystack.co/transaction/initialize"
-                payload = {
-                    "amount": amount,
-                    "reference": reference,
-                    "currency": data.get("currency", settings.PAYSTACK_CURRENCY),
-                    "channels": ["bank"],
-                }
-                if data.get("email"):
-                    payload["email"] = data["email"]
-                # pass bank details as metadata (optional)
-                metadata = {}
-                if data.get('bank_account_number'):
-                    metadata['bank_account_number'] = data.get('bank_account_number')
-                if data.get('bank_code'):
-                    metadata['bank_code'] = data.get('bank_code')
-                if metadata:
-                    payload['metadata'] = metadata
-                response = requests.post(paystack_api_url, json=payload, headers=headers)
-
-            else:
-                return Response({"detail": "Unsupported payment method."}, status=400)
-
+            response = requests.post(paystack_api_url, json=payload, headers=headers)
             paystack_response = response.json()
             success = paystack_response.get("status") is True
-            # Build standardized result
             result = {
                 "status": success,
                 "message": paystack_response.get("message", "Charge attempted"),
