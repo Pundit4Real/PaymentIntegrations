@@ -218,3 +218,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Django migration files
+# Ignore all app migration files but keep package initializer so apps remain importable
+**/migrations/
+!**/migrations/__init__.py
